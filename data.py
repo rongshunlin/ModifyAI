@@ -5,10 +5,6 @@
 # @Email        ：  rongshunlin@126.com
 # @File         ：  data.py
 # @description  ：  仅供学习, 请勿用于商业用途
-
-import tensorflow as tf
-from text_cnn import ModelConfig
-from tensorflow.contrib import learn
 import re
 import numpy as np
 
@@ -71,4 +67,5 @@ class DataSet(object):
             for batch_num in range(num_batches_per_epoch):
                 start_index = batch_num * batch_size
                 end_index = min((batch_num + 1) * batch_size, data_size)
+                print (shuffled_data[start_index])
                 yield shuffled_data[start_index:end_index]

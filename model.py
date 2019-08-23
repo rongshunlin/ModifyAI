@@ -18,8 +18,8 @@ flags = tf.flags
 FLAGS = flags.FLAGS
 
 # 数据路径
-flags.DEFINE_string("positive_data_file", "None", "splited by ,")
-flags.DEFINE_string("negative_data_file", "None", "splited by ,")
+flags.DEFINE_string("positive_data_file", "./data_set/polarity.pos", "splited by ,")
+flags.DEFINE_string("negative_data_file", "./data_set/polarity.neg", "splited by ,")
 flags.DEFINE_string("pred_data", "None", "splited by ,")
 flags.DEFINE_string("model_dir", "./data/model/", "output model dir")
 flags.DEFINE_string("output_dir", "./data/model/", "evaluate output dir")
@@ -111,6 +111,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev, model_config):
             vocab_processor.save(os.path.join(FLAGS.output_dir, "vocab"))
 
             # Initialize all variables
+            summary_writer = tf.summary.FileWriter('./log/', sess.graph)
             sess.run(tf.global_variables_initializer())
 
             def train_step(x_batch, y_batch):
@@ -150,15 +151,15 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev, model_config):
             # Training loop, For each batch ..
             for batch in batches:
                 x_batch, y_batch = zip(*batch)
-                train_step(x_batch, y_batch)
-                current_step = tf.train.global_step(sess, global_step)
-
-                if current_step % FLAGS.save_checkpoints_steps == 0:
-                    tf.logging.info("\nEvaluation:")
-                    dev_step(x_dev, y_dev)
-                if current_step % FLAGS.save_checkpoints_steps == 0:
-                    path = saver.save(sess, checkpoint_prefix, global_step=current_step)
-                    tf.logging.info("Saved model checkpoint to {}\n".format(path))
+            #     train_step(x_batch, y_batch)
+            #     current_step = tf.train.global_step(sess, global_step)
+            #
+            #     if current_step % FLAGS.save_checkpoints_steps == 0:
+            #         tf.logging.info("\nEvaluation:")
+            #         dev_step(x_dev, y_dev)
+            #     if current_step % FLAGS.save_checkpoints_steps == 0:
+            #         path = saver.save(sess, checkpoint_prefix, global_step=current_step)
+            #         tf.logging.info("Saved model checkpoint to {}\n".format(path))
 
 
 def main(_):
