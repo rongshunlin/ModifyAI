@@ -151,15 +151,15 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev, model_config):
             # Training loop, For each batch ..
             for batch in batches:
                 x_batch, y_batch = zip(*batch)
-            #     train_step(x_batch, y_batch)
-            #     current_step = tf.train.global_step(sess, global_step)
-            #
-            #     if current_step % FLAGS.save_checkpoints_steps == 0:
-            #         tf.logging.info("\nEvaluation:")
-            #         dev_step(x_dev, y_dev)
-            #     if current_step % FLAGS.save_checkpoints_steps == 0:
-            #         path = saver.save(sess, checkpoint_prefix, global_step=current_step)
-            #         tf.logging.info("Saved model checkpoint to {}\n".format(path))
+                train_step(x_batch, y_batch)
+                current_step = tf.train.global_step(sess, global_step)
+
+                if current_step % FLAGS.save_checkpoints_steps == 0:
+                    tf.logging.info("\nEvaluation:")
+                    dev_step(x_dev, y_dev)
+                if current_step % FLAGS.save_checkpoints_steps == 0:
+                    path = saver.save(sess, checkpoint_prefix, global_step=current_step)
+                    tf.logging.info("Saved model checkpoint to {}\n".format(path))
 
 
 def main(_):
