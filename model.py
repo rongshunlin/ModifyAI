@@ -55,7 +55,7 @@ def preprocess():
     max_document_length = max([len(x.split(" ")) for x in x_text])
     vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
     x = np.array(list(vocab_processor.fit_transform(x_text)))
-    tf.logging.info("Shape of X :{}".format(str(x.shape)))
+    tf.compat.v1.logging.info("Shape of X :{}".format(str(x.shape)))
 
     # Random shuffle data
     np.random.seed(10)
@@ -79,10 +79,10 @@ def preprocess():
         vocab_size=len(vocab_processor.vocabulary_),
         label_size=2
     )
-    tf.logging.info("Vocabulary size: {:d}".format(len(vocab_processor.vocabulary_)))
-    tf.logging.info("Train/dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
-    tf.logging.info("*******Init Model CONFIG*************")
-    tf.logging.info(model_config.to_string())
+    tf.compat.v1.logging.info("Vocabulary size: {:d}".format(len(vocab_processor.vocabulary_)))
+    tf.compat.v1.logging.info("Train/dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+    tf.compat.v1.logging.info("*******Init Model CONFIG*************")
+    tf.compat.v1.logging.info(model_config.to_string())
     return x_train, y_train, vocab_processor, x_dev, y_dev, model_config
 
 
@@ -129,7 +129,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev, model_config):
                     [train_op, global_step, cnn.loss, cnn.accuracy],
                     feed_dict)
                 time_str = datetime.datetime.now().isoformat()
-                tf.logging.info("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+                tf.compat.v1.logging.info("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
 
             def dev_step(x_batch, y_batch, writer=None):
                 """
@@ -143,7 +143,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev, model_config):
                     [global_step, cnn.loss, cnn.accuracy],
                     feed_dict)
                 time_str = datetime.datetime.now().isoformat()
-                tf.logging.info("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+                tf.compat.v1.logging.info("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
 
             # Generate batches
             batches = data.DataSet.batch_iter(list(zip(x_train, y_train)), FLAGS.batch_size, FLAGS.num_epochs)
@@ -155,15 +155,15 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev, model_config):
                 current_step = tf.train.global_step(sess, global_step)
 
                 if current_step % FLAGS.save_checkpoints_steps == 0:
-                    tf.logging.info("\nEvaluation:")
+                    tf.compat.v1.logging.info("\nEvaluation:")
                     dev_step(x_dev, y_dev)
                 if current_step % FLAGS.save_checkpoints_steps == 0:
                     path = saver.save(sess, checkpoint_prefix, global_step=current_step)
-                    tf.logging.info("Saved model checkpoint to {}\n".format(path))
+                    tf.compat.v1.logging.info("Saved model checkpoint to {}\n".format(path))
 
 
 def main(_):
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.logging.set_verbosity(tf.compat.v1.logging.info)
     x_train, y_train, vocab_processor, x_dev, y_dev, config = preprocess()
     train(x_train, y_train, vocab_processor, x_dev, y_dev, config)
 

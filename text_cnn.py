@@ -45,14 +45,14 @@ class TextCNNModel(object):
                  config,
                  is_training):
         self._config = config
-        tf.logging.info("\n ******TextCNN MODEL CONFIG*******")
-        tf.logging.info(self._config.to_string())
+        tf.compat.v1.logging.info("\n ******TextCNN MODEL CONFIG*******")
+        tf.compat.v1.logging.info(self._config.to_string())
 
-        tf.logging.info("\n ******Shape of MODEL VARS********")
+        tf.compat.v1.logging.info("\n ******Shape of MODEL VARS********")
         self.input_x = tf.placeholder(tf.int32, [None, self._config.max_seq_length], name="input_x")
         self.input_y = tf.placeholder(tf.float32, [None, self._config.label_size], name="input_y")
-        tf.logging.info("num_class {}".format(str(self.input_y.shape)))
-        tf.logging.info("is_trainging :{}".format(str(is_training)))
+        tf.compat.v1.logging.info("num_class {}".format(str(self.input_y.shape)))
+        tf.compat.v1.logging.info("is_trainging :{}".format(str(is_training)))
         l2_loss = tf.constant(0.0)
 
         # embedding layer
@@ -61,7 +61,7 @@ class TextCNNModel(object):
                                  name="W")
             self.char_emb = tf.nn.embedding_lookup(self.W, self.input_x)
             self.char_emb_expanded = tf.expand_dims(self.char_emb, -1)
-            tf.logging.info("Shape of embedding_chars:{}".format(str(self.char_emb_expanded.shape)))
+            tf.compat.v1.logging.info("Shape of embedding_chars:{}".format(str(self.char_emb_expanded.shape)))
 
         # convolution + pooling layer
         pooled_outputs = []
@@ -90,11 +90,11 @@ class TextCNNModel(object):
                     strides=[1, 1, 1, 1],
                     padding="VALID",
                     name="cov")
-                tf.logging.info("Shape of Conv:{}".format(str(conv.shape)))
+                tf.compat.v1.logging.info("Shape of Conv:{}".format(str(conv.shape)))
 
                 # apply non-linerity
                 h = tf.nn.relu(tf.nn.bias_add(conv, bias), name="relu")
-                tf.logging.info("Shape of h:{}".format(str(h)))
+                tf.compat.v1.logging.info("Shape of h:{}".format(str(h)))
 
                 # Maxpooling over the outputs
                 pooled = tf.nn.max_pool(
@@ -104,14 +104,14 @@ class TextCNNModel(object):
                     padding="VALID",
                     name="pool"
                 )
-                tf.logging.info("Shape of pooled:{}".format(str(pooled.shape)))
+                tf.compat.v1.logging.info("Shape of pooled:{}".format(str(pooled.shape)))
                 pooled_outputs.append(pooled)
-                tf.logging.info("Shape of pooled_outputs:{}".format(str(np.array(pooled_outputs).shape)))
+                tf.compat.v1.logging.info("Shape of pooled_outputs:{}".format(str(np.array(pooled_outputs).shape)))
 
         # concatenate all filter's output
         total_filter_num = self._config.num_filters * len(self._config.filter_sizes)
         all_features = tf.reshape(tf.concat(pooled_outputs, axis=-1), [-1, total_filter_num])
-        tf.logging.info("Shape of all_features:{}".format(str(all_features.shape)))
+        tf.compat.v1.logging.info("Shape of all_features:{}".format(str(all_features.shape)))
 
         # apply dropout during training
         if is_training:
@@ -120,9 +120,9 @@ class TextCNNModel(object):
         with tf.name_scope("output"):
             # output_dense_layer = tf.layers.Dense(self._config.label_size, use_bias=True, name="output_layer")
             # logits = output_dense_layer(all_features)
-            # tf.logging.info("Shape of logits:{}".format(str(logits.shape)))
+            # tf.compat.v1.logging.info("Shape of logits:{}".format(str(logits.shape)))
             # self.predictions = tf.nn.softmax(logits, name="predictions")
-            # tf.logging.info("Shape of predictions:{}".format(str(self.predictions.shape)))
+            # tf.compat.v1.logging.info("Shape of predictions:{}".format(str(self.predictions.shape)))
             W = tf.get_variable(
                 name="W",
                 shape=[total_filter_num, self._config.label_size],

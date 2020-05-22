@@ -40,7 +40,8 @@ for i in range(1, n_layers):
 mse_loss = tf.reduce_mean(tf.square(y_ - cur_layer))
 tf.add_to_collection('losses', mse_loss)
 loss = tf.add_n(tf.get_collection('losses'))
-train_op = tf.train.AdadeltaOptimizer(0.001).minimize(loss)
+global_step = tf.Variable(0, trainable=False)
+train_op = tf.train.AdadeltaOptimizer(0.001).minimize(loss, global_step=global_step)
 
 # genera data
 rdm = RandomState(1)
@@ -51,12 +52,14 @@ Y = [[x1 + x2 + rdm.rand()/10.0 - 0.5] for(x1, x2) in X]
 steps = 1000
 batch_size = 8
 
+
 # iterate data
 with tf.Session() as sess:
     tf.initialize_all_variables().run()
     for i in range(steps):
         start = (i * batch_size) % data_size
         end = min(start + batch_size, data_size)
-        sess.run(train_op, feed_dict={x:X[start:end], y_:Y[start:end]})
+        _, steps = sess.run([train_op, global_step], feed_dict={x:X[start:end], y_:Y[start:end]})
         if i % 50 == 0:
             print ("After %d iterations, total loss is %g"%(i, sess.run(loss, feed_dict={x:X, y_:Y})))
+            print ("steps %d validation"%(steps))
